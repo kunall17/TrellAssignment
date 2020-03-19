@@ -5,12 +5,20 @@ import android.net.Uri;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
@@ -20,6 +28,7 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheUtil;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
+import com.google.android.exoplayer2.video.VideoListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,8 +48,8 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     private SimpleCache cache;
 
     public ADapter(Context context) {
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/P7sls2VpRAJW8Vbz6rnUlU6WvLTZwEhp.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8ijoZpmyyWR6Kt1pOESjSZSJ4vES0s73.mp4");
+        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/P7sls2VpRAJW8Vbz6rnUlU6WvLTZwEhp.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/XRa8qdlzCvuMIhcRLcqrNYJlKNKa5OKB.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/j65taHwHTw4mCpbA5moVjVO6frzwkD3u.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8V7AyVafhbyMH2aWOL4xZdp8POAjskxn.mp4");
@@ -63,6 +72,9 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
         player.seekTo(0);
     }
 
+    public String replace(String url) {
+        return url.replace("user-videos/videos/orig/", "user-images/images/orig/thumb-").replace(".mp4", ".jpg");
+    }
 
     @Override
     public long getItemId(int position) {
@@ -91,8 +103,13 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @NonNull
     @Override
     public Viddd onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d("SEEHERE", "onCreateViewHolder: ");
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new Viddd(inflater.inflate(R.layout.item_list, parent, false));
+
+        Viddd viddd = new Viddd(inflater.inflate(R.layout.item_list, parent, false));
+
+
+        return viddd;
     }
 
     @Override
@@ -120,6 +137,20 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @Override
     public void onViewAttachedToWindow(@NonNull Viddd holder) {
         super.onViewAttachedToWindow(holder);
+        holder.thumbIv.setVisibility(View.VISIBLE);
+        Glide.with(context).addDefaultRequestListener(new RequestListener<Object>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Object> target, boolean isFirstResource) {
+                Log.d("ADapterseehere", "onLoadFailed() called with: e = [" + e + "], model = [" + model + "], target = [" + target + "], isFirstResource = [" + isFirstResource + "]");
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Object resource, Object model, Target<Object> target, DataSource dataSource, boolean isFirstResource) {
+                Log.d("ADapterseehere", "onResourceReady() called with: resource = [" + resource + "], model = [" + model + "], target = [" + target + "], dataSource = [" + dataSource + "], isFirstResource = [" + isFirstResource + "]");
+                return false;
+            }
+        }).load(replace(a.get(holder.getAdapterPosition()))).into(holder.thumbIv);
     }
 
     public void setPlayer(int s, @NotNull Viddd holder) {
@@ -130,6 +161,14 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
             lastINdex = s;
             holder.player.setPlayer(player);
             player.setPlayWhenReady(true);
+            holder.thumbIv.setVisibility(View.VISIBLE);
+            player.addVideoListener(new VideoListener() {
+                @Override
+                public void onRenderedFirstFrame() {
+                    holder.thumbIv.setVisibility(View.GONE);
+                }
+            });
+
         }
     }
 }

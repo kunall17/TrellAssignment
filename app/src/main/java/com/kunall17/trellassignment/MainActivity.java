@@ -1,7 +1,6 @@
 package com.kunall17.trellassignment;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,20 +25,19 @@ public class MainActivity extends AppCompatActivity {
         new PagerSnapHelper() {
         }.attachToRecyclerView(feedRv);
 
+        feedRv.setHasFixedSize(true);
+        feedRv.setLayoutManager(layoutManager);
+        feedRv.setAdapter(adapter);
         feedRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                Log.d("SEEHERE", "onScrollStateChanged: " + newState);
                 if (newState == 0) {
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                    Viddd viewHolderForLayoutPosition = (Viddd) feedRv.findViewHolderForLayoutPosition(firstVisibleItemPosition);
+                    Viddd viewHolderForLayoutPosition = (Viddd) feedRv.findViewHolderForAdapterPosition(firstVisibleItemPosition);
                     adapter.setPlayer(firstVisibleItemPosition, viewHolderForLayoutPosition);
                 }
             }
         });
-        feedRv.setHasFixedSize(true);
-        feedRv.setLayoutManager(layoutManager);
-        feedRv.setAdapter(adapter);
     }
 }
