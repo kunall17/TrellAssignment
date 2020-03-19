@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
         feedRv = findViewById(R.id.recyclerView);
         ADapter adapter = new ADapter(this);
+        adapter.setHasStableIds(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         new PagerSnapHelper() {
         }.attachToRecyclerView(feedRv);
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                Log.d("SEEHERE", "onScrollStateChanged: " + newState);
                 if (newState == 0) {
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                     Viddd viewHolderForLayoutPosition = (Viddd) feedRv.findViewHolderForLayoutPosition(firstVisibleItemPosition);
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        feedRv.setHasFixedSize(true);
         feedRv.setLayoutManager(layoutManager);
         feedRv.setAdapter(adapter);
     }

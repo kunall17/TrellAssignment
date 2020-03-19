@@ -63,81 +63,29 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
         player.seekTo(0);
     }
 
-    private void preCache(int position, Context context) {
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    private void preCache(int position, Context context) {
         String url = a.get(position);
         DataSpec dataSpec = new DataSpec(Uri.parse(url), 0, 1024 * 1024, null);
         Pair<Long, Long> cached = CacheUtil.getCached(dataSpec, cache, null);
-        Log.d("SEEHERE", "preCache: " + cached);
 
         if (cached.second != 0) {
-            Log.d("SEEHERE", "!!!!preCache: " + cached);
             return;
         }
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    CacheUtil.cache(dataSpec, cache, null, dataSourceFactory.createDataSource(), new CacheUtil.ProgressListener() {
-                        @Override
-                        public void onProgress(long requestLength, long bytesCached, long newBytesCached) {
-                            Log.d("ADapterseehere", position + "onProgress() called with: requestLength = [" + requestLength + "], bytesCached = [" + bytesCached + "], newBytesCached = [" + newBytesCached + "]");
-                        }
-                    }, new AtomicBoolean(false));
-                    System.out.println("seehere");
-                } catch (Exception e) {
-                    System.out.println("Exception");
-                    e.printStackTrace();
-                }
+        Thread thread = new Thread(() -> {
+            try {
+                CacheUtil.cache(dataSpec, cache, null, dataSourceFactory.createDataSource(), null, new AtomicBoolean(false));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         thread.start();
-
-//
-//        AsyncTask.execute(() -> {
-//            Log.d("SEEHERE", "preCache: executing");
-//            PriorityTaskManager mPriorityTaskManager = new PriorityTaskManager();
-//            mPriorityTaskManager.add(C.PRIORITY_DOWNLOAD);
-//
-//            DataSource cacheReadDataSource = new FileDataSource();
-//            DefaultDataSourceFactory upstreamFactory =
-//                    new DefaultDataSourceFactory(context, factory);
-//            DataSink cacheWriteDataSink = new CacheDataSink(cache, DEFAULT_MAX_CACHE_FILE_SIZE);
-//            DataSource upstream = upstreamFactory.createDataSource();
-//            upstream = new PriorityDataSource(upstream, mPriorityTaskManager, C.PRIORITY_DOWNLOAD);
-//
-//            int progressive_download = Log.e("progressive_download", "Create priority upstream data source!");
-//            CacheDataSource cacheDataSource = new CacheDataSource(cache, upstream, cacheReadDataSource,
-//                    cacheWriteDataSink, 0, new CacheDataSource.EventListener() {
-//                @Override
-//                public void onCachedBytesRead(long cacheSizeBytes, long cachedBytesRead) {
-//                    Log.d("SEEHERE", "onCachedBytesRead() called with: cacheSizeBytes = [" + cacheSizeBytes + "], cachedBytesRead = [" + cachedBytesRead + "]");
-//                }
-//
-//                @Override
-//                public void onCacheIgnored(int reason) {
-//                    Log.d("SEEHERE", "onCacheIgnored() called with: reason = [" + reason + "]");
-//                }
-//            });
-//
-//            AtomicBoolean atomicBoolean = new AtomicBoolean(false);
-//            try {
-//                Log.d("SEEHERE", "preCache: ");
-//                CacheUtil.cache(dataSpec, cache, null, cacheDataSource, new CacheUtil.ProgressListener() {
-//                    @Override
-//                    public void onProgress(long requestLength, long bytesCached, long newBytesCached) {
-//                        Log.d("SEEHERE", "onProgress() called with: requestLength = [" + requestLength + "], bytesCached = [" + bytesCached + "], newBytesCached = [" + newBytesCached + "]");
-//                    }
-//                }, atomicBoolean);
-//                Log.d("SEEHERE", "preCache: done ");
-//                cacheDataSource.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        });
     }
 
     @NonNull
@@ -149,7 +97,6 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
 
     @Override
     public void onBindViewHolder(@NonNull Viddd holder, int position) {
-        Log.d("ADapterseehere", "onBindViewHolder() called with: holder = [" + holder + "], position = [" + position + "]");
         if (getItemCount() > position + 1) {
             preCache(position + 1, context);
         }
@@ -162,9 +109,7 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @Override
     public void onViewDetachedFromWindow(@NonNull Viddd holder) {
         super.onViewDetachedFromWindow(holder);
-        Log.d("ADapterseehere", "onViewDetachedFromWindow() called with: holder = [" + holder.getAdapterPosition() + "]");
         holder.player.setPlayer(null);
-
     }
 
     @Override
@@ -175,11 +120,9 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @Override
     public void onViewAttachedToWindow(@NonNull Viddd holder) {
         super.onViewAttachedToWindow(holder);
-        Log.d("ADapterseehere", "onViewAttachedToWindow() called with: holder = [" + holder.getAdapterPosition() + "]");
     }
 
     public void setPlayer(int s, @NotNull Viddd holder) {
-        Log.d("ADapterseehere", "setPlayer() called with: s = [" + s + "], holder = [" + holder + "]");
         if (lastINdex != s) {
             ProgressiveMediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(a.get(s)));
             player.prepare(mediaSource);
