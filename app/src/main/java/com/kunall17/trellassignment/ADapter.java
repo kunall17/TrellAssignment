@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
@@ -49,7 +49,6 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
 
     public ADapter(Context context) {
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8ijoZpmyyWR6Kt1pOESjSZSJ4vES0s73.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/P7sls2VpRAJW8Vbz6rnUlU6WvLTZwEhp.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/XRa8qdlzCvuMIhcRLcqrNYJlKNKa5OKB.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/j65taHwHTw4mCpbA5moVjVO6frzwkD3u.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8V7AyVafhbyMH2aWOL4xZdp8POAjskxn.mp4");
@@ -58,6 +57,7 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/UdTgjehMxzugb7TN4O4Ycg5QVgqlojx8.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/r7EsSAGF6a1q2vXdZXFDUCTJ7wMLBGEO.mp4");
         a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/fDkn4hLtkApjqyVq6vEItYKUcr8Kgxlf.mp4");
+        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/P7sls2VpRAJW8Vbz6rnUlU6WvLTZwEhp.mp4");
 
         this.context = context;
         File file = new File(context.getCacheDir(), "media");
@@ -66,10 +66,6 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
         factory = new DefaultHttpDataSourceFactory("android-marsplay-video-player");
         dataSourceFactory = new CacheDataSourceFactory(getSimpleCache(), factory);
         player = new SimpleExoPlayer.Builder(context, defaultRenderersFactory).build();
-
-        ProgressiveMediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(a.get(0)));
-        player.prepare(mediaSource);
-        player.seekTo(0);
     }
 
     public String replace(String url) {
@@ -98,18 +94,17 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
             }
         });
         thread.start();
+        FutureTarget<File> submit = Glide.with(context)
+                .downloadOnly()
+                .load(url)
+                .submit();
     }
 
     @NonNull
     @Override
     public Viddd onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("SEEHERE", "onCreateViewHolder: ");
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
-        Viddd viddd = new Viddd(inflater.inflate(R.layout.item_list, parent, false));
-
-
-        return viddd;
+        return new Viddd(inflater.inflate(R.layout.item_list, parent, false));
     }
 
     @Override
@@ -138,19 +133,8 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     public void onViewAttachedToWindow(@NonNull Viddd holder) {
         super.onViewAttachedToWindow(holder);
         holder.thumbIv.setVisibility(View.VISIBLE);
-        Glide.with(context).addDefaultRequestListener(new RequestListener<Object>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Object> target, boolean isFirstResource) {
-                Log.d("ADapterseehere", "onLoadFailed() called with: e = [" + e + "], model = [" + model + "], target = [" + target + "], isFirstResource = [" + isFirstResource + "]");
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Object resource, Object model, Target<Object> target, DataSource dataSource, boolean isFirstResource) {
-                Log.d("ADapterseehere", "onResourceReady() called with: resource = [" + resource + "], model = [" + model + "], target = [" + target + "], dataSource = [" + dataSource + "], isFirstResource = [" + isFirstResource + "]");
-                return false;
-            }
-        }).load(replace(a.get(holder.getAdapterPosition()))).into(holder.thumbIv);
+        Glide.with(context).load(replace(a.get(holder.getAdapterPosition()))).into(holder.thumbIv);
+        if (lastINdex == -1) setPlayer(0, holder);
     }
 
     public void setPlayer(int s, @NotNull Viddd holder) {
@@ -170,5 +154,11 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
             });
 
         }
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        player.release();
     }
 }
