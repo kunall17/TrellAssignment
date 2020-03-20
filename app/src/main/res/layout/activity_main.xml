@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="adapter"
+            type="com.kunall17.trellassignment.adapter.PlayerAdapter" />
+
+        <variable
+            name="viewModel"
+            type="com.kunall17.trellassignment.viewmodels.DataViewModel">
+
+        </variable>
+    </data>
+
+    <androidx.recyclerview.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/recycler_view"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        app:adapter="@{adapter}"
+        tools:context=".ui.MainActivity">
+    </androidx.recyclerview.widget.RecyclerView>
+</layout>
