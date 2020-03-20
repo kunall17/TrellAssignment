@@ -6,6 +6,9 @@
         <variable
             name="post"
             type="com.kunall17.trellassignment.viewmodels.Post" />
+        <variable
+            name="thumbVisibilty"
+            type="java.lang.Boolean" />
     </data>
 
     <RelativeLayout
@@ -23,6 +26,14 @@
             app:surface_type="texture_view"
             app:use_artwork="true"
             app:use_controller="true" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/thumb_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{thumbVisibilty ? View.VISIBLE : View.GONE, default=gone}"
+            app:imageUrl="@{post.thumbnailUrl}" />
+
     </RelativeLayout>
 </layout>
 
