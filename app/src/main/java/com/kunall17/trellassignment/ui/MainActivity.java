@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kunall17.trellassignment.R;
 import com.kunall17.trellassignment.adapter.PlayerAdapter;
+import com.kunall17.trellassignment.databinding.ActivityMainBinding;
 import com.kunall17.trellassignment.viewholders.PlayerViewHolder;
 import com.kunall17.trellassignment.viewmodels.DataViewModel;
-import com.kunall17.trellassignment.R;
-import com.kunall17.trellassignment.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,12 +33,12 @@ public class MainActivity extends AppCompatActivity {
         feedRv = binding.recyclerView;
         PlayerAdapter adapter = new PlayerAdapter(this, dataViewModel);
         adapter.setHasStableIds(true);
+        binding.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         new PagerSnapHelper().attachToRecyclerView(feedRv);
 
         feedRv.setHasFixedSize(true);
         feedRv.setLayoutManager(layoutManager);
-        feedRv.setAdapter(adapter);
         feedRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {

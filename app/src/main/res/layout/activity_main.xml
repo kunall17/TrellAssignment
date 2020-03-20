@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <variable
+            name="adapter"
+            type="com.kunall17.trellassignment.adapter.PlayerAdapter" />
 
         <variable
             name="viewModel"
@@ -15,8 +18,7 @@
         android:id="@+id/recycler_view"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        app:adapter="@{adapter}"
         tools:context=".ui.MainActivity">
-<!--        app:adapter="@{viewModel.adapter}"-->
-<!--        app:data="@{viewModel.data}"-->
     </androidx.recyclerview.widget.RecyclerView>
 </layout>
