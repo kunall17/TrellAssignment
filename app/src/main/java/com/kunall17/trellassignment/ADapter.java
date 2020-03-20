@@ -9,15 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.FutureTarget;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -33,7 +28,6 @@ import com.google.android.exoplayer2.video.VideoListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ADapter extends RecyclerView.Adapter<Viddd> {
@@ -43,23 +37,13 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     private final SimpleExoPlayer player;
     private final DefaultHttpDataSourceFactory factory;
     private final Context context;
+    private final DataViewModel dataViewModel;
     int lastINdex = -1;
-    private ArrayList<String> a = new ArrayList<>();
     private SimpleCache cache;
 
-    public ADapter(Context context) {
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8ijoZpmyyWR6Kt1pOESjSZSJ4vES0s73.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/XRa8qdlzCvuMIhcRLcqrNYJlKNKa5OKB.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/j65taHwHTw4mCpbA5moVjVO6frzwkD3u.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8V7AyVafhbyMH2aWOL4xZdp8POAjskxn.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/W1snOQYcmY2Wv06pF0gZZivFnyWUgnuj.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/8COPuaSXvzyqzM4MG3FCRZNwVGxFmEEd.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/UdTgjehMxzugb7TN4O4Ycg5QVgqlojx8.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/r7EsSAGF6a1q2vXdZXFDUCTJ7wMLBGEO.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/fDkn4hLtkApjqyVq6vEItYKUcr8Kgxlf.mp4");
-        a.add("https://cdn.trell.co/h_640,w_640/user-videos/videos/orig/P7sls2VpRAJW8Vbz6rnUlU6WvLTZwEhp.mp4");
-
+    public ADapter(Context context, DataViewModel dataViewModel) {
         this.context = context;
+        this.dataViewModel = dataViewModel;
         File file = new File(context.getCacheDir(), "media");
         cache = new SimpleCache(file, new LeastRecentlyUsedCacheEvictor(1048576000));
         DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(context).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
@@ -68,17 +52,13 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
         player = new SimpleExoPlayer.Builder(context, defaultRenderersFactory).build();
     }
 
-    public String replace(String url) {
-        return url.replace("user-videos/videos/orig/", "user-images/images/orig/thumb-").replace(".mp4", ".jpg");
-    }
-
     @Override
     public long getItemId(int position) {
         return position;
     }
 
     private void preCache(int position, Context context) {
-        String url = a.get(position);
+        String url = dataViewModel.fetchPost(position).getPostUrl();
         DataSpec dataSpec = new DataSpec(Uri.parse(url), 0, 1024 * 1024, null);
         Pair<Long, Long> cached = CacheUtil.getCached(dataSpec, cache, null);
 
@@ -126,33 +106,35 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
 
     @Override
     public int getItemCount() {
-        return a.size();
+        return dataViewModel.getPostListSize();
     }
 
     @Override
     public void onViewAttachedToWindow(@NonNull Viddd holder) {
         super.onViewAttachedToWindow(holder);
+        Log.d("ADapterseehere", "onViewAttachedToWindow() called with: holder = [" + holder + "]");
         holder.thumbIv.setVisibility(View.VISIBLE);
-        Glide.with(context).load(replace(a.get(holder.getAdapterPosition()))).into(holder.thumbIv);
+        Glide.with(context).load(dataViewModel.fetchPost(holder.getAdapterPosition()).getThumbnailUrl()).into(holder.thumbIv);
         if (lastINdex == -1) setPlayer(0, holder);
     }
 
     public void setPlayer(int s, @NotNull Viddd holder) {
+        Log.d("ADapterseehere", "setPlayer() called with: s = [" + s + "], holder = [" + holder + "]");
         if (lastINdex != s) {
-            ProgressiveMediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(a.get(s)));
+            ProgressiveMediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(dataViewModel.fetchPost(s).getPostUrl()));
             player.prepare(mediaSource);
             player.seekTo(0);
             lastINdex = s;
             holder.player.setPlayer(player);
             player.setPlayWhenReady(true);
             holder.thumbIv.setVisibility(View.VISIBLE);
+            player.removeVideoListener(null);
             player.addVideoListener(new VideoListener() {
                 @Override
                 public void onRenderedFirstFrame() {
                     holder.thumbIv.setVisibility(View.GONE);
                 }
             });
-
         }
     }
 
