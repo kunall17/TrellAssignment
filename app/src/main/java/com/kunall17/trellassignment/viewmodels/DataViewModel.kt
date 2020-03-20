@@ -3,6 +3,7 @@ package com.kunall17.trellassignment.viewmodels
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -55,6 +56,34 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         player = SimpleExoPlayer.Builder(application, defaultRenderersFactory).build()
     }
 
+    fun preCache(position: Int) {
+        val url = fetchPost(position).postUrl
+        val dataSpec = DataSpec(Uri.parse(url), 0, 1024 * 1024, null)
+        val cached = CacheUtil.getCached(dataSpec, cache, null)
+        if (cached.second > 0) {
+            return
+        }
+        val thread = Thread(Runnable {
+            try {
+                CacheUtil.cache(
+                    dataSpec,
+                    cache,
+                    null,
+                    dataSourceFactory.createDataSource(),
+                    null,
+                    AtomicBoolean(false)
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+        thread.start()
+
+        Glide.with(getApplication<Application>().baseContext)
+            .downloadOnly()
+            .load(url)
+            .submit()
+    }
 
     fun generateMediaSource(firstVisibleItemPosition: Int): ProgressiveMediaSource =
         ProgressiveMediaSource.Factory(getDataSourceFactory()).createMediaSource(

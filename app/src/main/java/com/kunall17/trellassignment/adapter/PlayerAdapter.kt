@@ -47,6 +47,9 @@ class PlayerAdapter(
     }
 
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
+        if (itemCount > position + 1) {
+            dataViewModel.preCache(position + 1)
+        }
     }
 
     override fun onViewDetachedFromWindow(holder: PlayerViewHolder) {
@@ -64,4 +67,7 @@ class PlayerAdapter(
         if (lastIndex == -1) initPlayerMediaSource(holder, 0)
     }
 
+    companion object {
+        const val DEFAULT_MAX_CACHE_FILE_SIZE = 5 * 1024 * 1024.toLong()
+    }
 }
