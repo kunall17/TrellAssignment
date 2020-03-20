@@ -1,4 +1,4 @@
-package com.kunall17.trellassignment;
+package com.kunall17.trellassignment.viewmodels;
 
 import android.widget.ImageView;
 

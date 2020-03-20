@@ -1,4 +1,4 @@
-package com.kunall17.trellassignment;
+package com.kunall17.trellassignment.ui;
 
 import android.os.Bundle;
 
@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kunall17.trellassignment.adapter.PlayerAdapter;
+import com.kunall17.trellassignment.viewholders.PlayerViewHolder;
+import com.kunall17.trellassignment.viewmodels.DataViewModel;
+import com.kunall17.trellassignment.R;
 import com.kunall17.trellassignment.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         binding.setViewModel(dataViewModel);
 
         feedRv = binding.recyclerView;
-        ADapter adapter = new ADapter(this, dataViewModel);
+        PlayerAdapter adapter = new PlayerAdapter(this, dataViewModel);
         adapter.setHasStableIds(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         new PagerSnapHelper().attachToRecyclerView(feedRv);
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == 0) {
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                    Viddd viewHolderForLayoutPosition = (Viddd) feedRv.findViewHolderForAdapterPosition(firstVisibleItemPosition);
+                    PlayerViewHolder viewHolderForLayoutPosition = (PlayerViewHolder) feedRv.findViewHolderForAdapterPosition(firstVisibleItemPosition);
                     adapter.setPlayer(firstVisibleItemPosition, viewHolderForLayoutPosition);
                 }
             }

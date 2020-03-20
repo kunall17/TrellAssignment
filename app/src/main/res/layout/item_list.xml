@@ -5,7 +5,7 @@
         <import type="android.view.View" />
         <variable
             name="post"
-            type="com.kunall17.trellassignment.Post" />
+            type="com.kunall17.trellassignment.viewmodels.Post" />
         <variable
             name="thumbVisibilty"
             type="java.lang.Boolean" />

@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.kunall17.trellassignment.DataViewModel">
+            type="com.kunall17.trellassignment.viewmodels.DataViewModel">
 
         </variable>
     </data>
@@ -15,7 +15,7 @@
         android:id="@+id/recycler_view"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".ui.MainActivity">
 <!--        app:adapter="@{viewModel.adapter}"-->
 <!--        app:data="@{viewModel.data}"-->
     </androidx.recyclerview.widget.RecyclerView>

@@ -1,6 +1,8 @@
-package com.kunall17.trellassignment;
+package com.kunall17.trellassignment.viewmodels;
 
 import androidx.lifecycle.ViewModel;
+
+import com.kunall17.trellassignment.repository.PostRepository;
 
 import java.util.ArrayList;
 

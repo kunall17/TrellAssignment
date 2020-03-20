@@ -1,4 +1,4 @@
-package com.kunall17.trellassignment;
+package com.kunall17.trellassignment.viewholders;
 
 import android.widget.ImageView;
 
@@ -11,13 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.kunall17.trellassignment.viewmodels.Post;
+import com.kunall17.trellassignment.R;
 
-public class Viddd extends RecyclerView.ViewHolder {
+public class PlayerViewHolder extends RecyclerView.ViewHolder {
 
     private final ViewDataBinding binding;
     PlayerView player;
 
-    public Viddd(@NonNull ViewDataBinding itemView) {
+    public PlayerViewHolder(@NonNull ViewDataBinding itemView) {
         super(itemView.getRoot());
         this.binding = itemView;
         player = (binding.getRoot().findViewById(R.id.main_iv));
@@ -32,7 +34,7 @@ public class Viddd extends RecyclerView.ViewHolder {
         return binding;
     }
 
-    void attach(Post post) {
+    public void attach(Post post) {
         binding.setVariable(BR.thumbVisibilty, true);
         binding.setVariable(BR.post, post);
         binding.executePendingBindings();

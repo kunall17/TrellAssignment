@@ -1,4 +1,6 @@
-package com.kunall17.trellassignment;
+package com.kunall17.trellassignment.repository;
+
+import com.kunall17.trellassignment.viewmodels.Post;
 
 import java.util.ArrayList;
 
