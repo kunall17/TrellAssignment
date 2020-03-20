@@ -1,25 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="post"
+            type="com.kunall17.trellassignment.Post" />
+        <variable
+            name="thumbVisibilty"
+            type="java.lang.Boolean" />
+    </data>
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/main_iv"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        app:default_artwork="@color/colorPrimaryDark"
-        app:resize_mode="fit"
-        app:show_buffering="always"
-        app:surface_type="texture_view"
-        app:use_artwork="true"
-        app:use_controller="true" />
+        android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/thumb_iv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/main_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            app:default_artwork="@color/colorPrimaryDark"
+            app:resize_mode="fit"
+            app:show_buffering="always"
+            app:surface_type="texture_view"
+            app:use_artwork="true"
+            app:use_controller="true" />
 
-</RelativeLayout>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/thumb_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{thumbVisibilty ? View.VISIBLE : View.GONE, default=gone}"
+            app:imageUrl="@{post.thumbnailUrl}" />
+
+    </RelativeLayout>
+</layout>
+
+

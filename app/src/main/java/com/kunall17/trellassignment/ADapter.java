@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -38,7 +40,7 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     private final DefaultHttpDataSourceFactory factory;
     private final Context context;
     private final DataViewModel dataViewModel;
-    int lastINdex = -1;
+    private int lastINdex = -1;
     private SimpleCache cache;
 
     public ADapter(Context context, DataViewModel dataViewModel) {
@@ -83,12 +85,13 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @NonNull
     @Override
     public Viddd onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new Viddd(inflater.inflate(R.layout.item_list, parent, false));
+        ViewDataBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_list, parent, false);
+        return new Viddd(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Viddd holder, int position) {
+
         if (getItemCount() > position + 1) {
             preCache(position + 1, context);
         }
@@ -101,7 +104,7 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @Override
     public void onViewDetachedFromWindow(@NonNull Viddd holder) {
         super.onViewDetachedFromWindow(holder);
-        holder.player.setPlayer(null);
+        holder.onViewDetachedFromWindow(); //   player.setPlayer(null);
     }
 
     @Override
@@ -112,9 +115,7 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @Override
     public void onViewAttachedToWindow(@NonNull Viddd holder) {
         super.onViewAttachedToWindow(holder);
-        Log.d("ADapterseehere", "onViewAttachedToWindow() called with: holder = [" + holder + "]");
-        holder.thumbIv.setVisibility(View.VISIBLE);
-        Glide.with(context).load(dataViewModel.fetchPost(holder.getAdapterPosition()).getThumbnailUrl()).into(holder.thumbIv);
+        holder.attach(dataViewModel.fetchPost(holder.getAdapterPosition()));
         if (lastINdex == -1) setPlayer(0, holder);
     }
 
@@ -125,14 +126,13 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
             player.prepare(mediaSource);
             player.seekTo(0);
             lastINdex = s;
-            holder.player.setPlayer(player);
+            holder.setPlayer(player);
             player.setPlayWhenReady(true);
-            holder.thumbIv.setVisibility(View.VISIBLE);
             player.removeVideoListener(null);
             player.addVideoListener(new VideoListener() {
                 @Override
                 public void onRenderedFirstFrame() {
-                    holder.thumbIv.setVisibility(View.GONE);
+                    holder.setThumbVisibility(false);
                 }
             });
         }

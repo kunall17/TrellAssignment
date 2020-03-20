@@ -1,13 +1,11 @@
 package com.kunall17.trellassignment;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,8 +30,7 @@ public class MainActivity extends AppCompatActivity {
         ADapter adapter = new ADapter(this, dataViewModel);
         adapter.setHasStableIds(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        new PagerSnapHelper() {
-        }.attachToRecyclerView(feedRv);
+        new PagerSnapHelper().attachToRecyclerView(feedRv);
 
         feedRv.setHasFixedSize(true);
         feedRv.setLayoutManager(layoutManager);
