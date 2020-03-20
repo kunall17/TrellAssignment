@@ -4,15 +4,18 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.PriorityDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.CacheUtil
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import com.google.android.exoplayer2.util.PriorityTaskManager
 import com.kunall17.trellassignment.repository.PostRepository
 import java.io.File
 import java.util.*
@@ -22,9 +25,11 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     private val postRepository: PostRepository
     private var postList: ArrayList<Post> = ArrayList()
 
-    private var dataSourceFactory: CacheDataSourceFactory
+    private var dataSourceFactory: PriorityDataSourceFactory
+    private var cacheDataSourceFactory: CacheDataSourceFactory
     var defaultRenderersFactory: DefaultRenderersFactory
     private var player: SimpleExoPlayer
+    private var priortyTaskMaanger: PriorityTaskManager
     private var factory: DefaultHttpDataSourceFactory
     private var cache: SimpleCache
 
@@ -39,20 +44,26 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         return postList[position]
     }
 
-    fun getDataSourceFactory(): CacheDataSourceFactory {
+    fun getDataSourceFactory(): PriorityDataSourceFactory {
         return dataSourceFactory
     }
 
     init {
         postRepository = PostRepository()
         fetchPostsList()
-
+        priortyTaskMaanger = PriorityTaskManager()
         val file = File(application.cacheDir, "media")
         cache = SimpleCache(file, LeastRecentlyUsedCacheEvictor(1048576000))
         defaultRenderersFactory =
             DefaultRenderersFactory(application).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
         factory = DefaultHttpDataSourceFactory("android-marsplay-video-player")
-        dataSourceFactory = CacheDataSourceFactory(cache, factory)
+        cacheDataSourceFactory = CacheDataSourceFactory(cache, factory)
+        dataSourceFactory =
+            PriorityDataSourceFactory(
+                cacheDataSourceFactory,
+                priortyTaskMaanger,
+                1000
+            )
         player = SimpleExoPlayer.Builder(application, defaultRenderersFactory).build()
     }
 
@@ -65,13 +76,18 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         }
         val thread = Thread(Runnable {
             try {
+                val priorityTaskManager = null
                 CacheUtil.cache(
                     dataSpec,
                     cache,
                     null,
-                    dataSourceFactory.createDataSource(),
+                    cacheDataSourceFactory.createDataSource(),
+                    ByteArray(CacheUtil.DEFAULT_BUFFER_SIZE_BYTES),
+                    priorityTaskManager,
+                    0,
                     null,
-                    AtomicBoolean(false)
+                    AtomicBoolean(false),
+                    /* enableEOFException= */false
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
