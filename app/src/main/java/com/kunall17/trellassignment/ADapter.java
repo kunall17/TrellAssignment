@@ -85,8 +85,7 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     @NonNull
     @Override
     public Viddd onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ViewDataBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_list, parent, false);
-        return new Viddd(binding);
+        return new Viddd(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_list, parent, false));
     }
 
     @Override
@@ -120,7 +119,6 @@ public class ADapter extends RecyclerView.Adapter<Viddd> {
     }
 
     public void setPlayer(int s, @NotNull Viddd holder) {
-        Log.d("ADapterseehere", "setPlayer() called with: s = [" + s + "], holder = [" + holder + "]");
         if (lastINdex != s) {
             ProgressiveMediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(dataViewModel.fetchPost(s).getPostUrl()));
             player.prepare(mediaSource);
