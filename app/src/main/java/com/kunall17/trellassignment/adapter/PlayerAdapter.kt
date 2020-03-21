@@ -20,7 +20,12 @@ class PlayerAdapter(
         return position.toLong()
     }
 
+    private var lastHolder: PlayerViewHolder? = null
+
     fun initPlayerMediaSource(holder: PlayerViewHolder, position: Int) {
+        if (lastHolder == holder) return
+        lastHolder?.setPlayer(null)
+        lastHolder = holder
         val mediaSource =
             dataViewModel.generateMediaSource(position)
         player.prepare(mediaSource)
