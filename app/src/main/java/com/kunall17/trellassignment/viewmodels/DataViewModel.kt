@@ -19,7 +19,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class DataViewModel(application: Application) : AndroidViewModel(application) {
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository = PostRepository()
     private var postList: ArrayList<Post> = ArrayList()
 
     private var dataSourceFactory: CacheDataSourceFactory
@@ -44,13 +44,14 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
-        postRepository = PostRepository()
         fetchPostsList()
 
         val file = File(application.cacheDir, "media")
         cache = SimpleCache(file, LeastRecentlyUsedCacheEvictor(1048576000))
         defaultRenderersFactory =
-            DefaultRenderersFactory(application).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
+            DefaultRenderersFactory(application).setExtensionRendererMode(
+                DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+            )
         factory = DefaultHttpDataSourceFactory("android-marsplay-video-player")
         dataSourceFactory = CacheDataSourceFactory(cache, factory)
         player = SimpleExoPlayer.Builder(application, defaultRenderersFactory).build()
