@@ -5,7 +5,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView feedRv;
     private DataViewModel dataViewModel;
     private ActivityMainBinding binding;
+    private AppCompatEditText searchEt;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,24 +34,21 @@ public class MainActivity extends AppCompatActivity {
         binding.setViewModel(dataViewModel);
 
         feedRv = binding.recyclerView;
-        PlayerAdapter adapter = new PlayerAdapter(this, dataViewModel);
+        searchEt = binding.searchEt;
+        PlayerAdapter adapter = new PlayerAdapter(dataViewModel);
         adapter.setHasStableIds(true);
         binding.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        new PagerSnapHelper().attachToRecyclerView(feedRv);
-
         feedRv.setHasFixedSize(true);
         feedRv.setLayoutManager(layoutManager);
-        feedRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == 0) {
-                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                    PlayerViewHolder viewHolderForLayoutPosition = (PlayerViewHolder) feedRv.findViewHolderForAdapterPosition(firstVisibleItemPosition);
-                    adapter.setPlayer(firstVisibleItemPosition, viewHolderForLayoutPosition);
-                }
-            }
-        });
+
+
+        dataViewModel.getMutableLiveData().observe(this, adapter::setData);
+
+    }
+
+
+    private void d() {
+
     }
 }
